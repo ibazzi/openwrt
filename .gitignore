@@ -1,3 +1,4 @@
+/.device
 *.o
 .DS_Store
 .*.swp
