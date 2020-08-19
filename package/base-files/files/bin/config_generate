@@ -48,11 +48,6 @@ generate_static_network() {
 		set network.globals='globals'
 		set network.globals.dhcp_default_duid='auto'
 	EOF
-	[ -e /proc/sys/net/ipv6 ] && {
-		uci -q batch <<-EOF
-			set network.globals.ula_prefix='auto'
-		EOF
-	}
 
 	if json_is_a dsl object; then
 		json_select dsl
@@ -314,9 +309,9 @@ generate_static_system() {
 		delete system.@system[0]
 		add system system
 		set system.@system[-1].hostname='OpenWrt'
-		set system.@system[-1].timezone='GMT0'
+		set system.@system[-1].timezone='Asia/Shanghai'
 		set system.@system[-1].zonename='UTC'
-		set system.@system[-1].ttylogin='0'
+		set system.@system[-1].ttylogin='1'
 		set system.@system[-1].log_size='128'
 		set system.@system[-1].urandom_seed='0'
 
