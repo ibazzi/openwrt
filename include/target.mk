@@ -44,7 +44,8 @@ DEFAULT_PACKAGES:=\
 	uci \
 	uclient-fetch \
 	urandom-seed \
-	urngd
+	urngd \
+	iptables-mod-nat-extra kmod-nf-nathelper kmod-nf-nathelper-extra luci strongswan-full luci-proto-zerotier opennhrp
 
 ifneq ($(CONFIG_USE_APK),)
 DEFAULT_PACKAGES+=apk-mbedtls
@@ -78,7 +79,7 @@ DEFAULT_PACKAGES.nas:=\
 	mdadm
 # For router targets
 DEFAULT_PACKAGES.router:=\
-	dnsmasq \
+	dnsmasq-full \
 	firewall4 \
 	nftables \
 	kmod-nft-offload \
