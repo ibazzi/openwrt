@@ -1,0 +1,24 @@
+--- a/meson.build
++++ b/meson.build
+@@ -724,6 +724,9 @@ if systemd.found()
+   systemdsystemunitdir = systemd.get_pkgconfig_variable('systemdsystemunitdir')
+ endif
+ 
++colors_default = get_option('colors-default')
++conf.set('USE_COLORS_BY_DEFAULT', colors_default ? 1 : false)
++
+ chfn_chsh_password = get_option('chfn-chsh-password') or lib_user.found()
+ conf.set('CHFN_CHSH_PASSWORD', chfn_chsh_password ? 1 : false)
+ 
+--- a/meson_options.txt
++++ b/meson_options.txt
+@@ -172,6 +172,9 @@ option('static-programs', type : 'array',
+ 
+ # feature selection and other configuration
+ 
++option('colors-default',
++       type : 'boolean', value : true,
++       description : 'Enables colorized output from utils by default')
+ option('chfn-chsh-password',
+        type : 'boolean', value : true,
+        description : 'require the user to enter the password in chfn and chsh')
