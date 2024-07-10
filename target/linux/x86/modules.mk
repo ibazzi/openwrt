@@ -6,9 +6,7 @@ define KernelPackage/amd-xgbe
   SUBMENU:=$(NETWORK_DEVICES_MENU)
   TITLE:=AMD Ethernet on SoC support
   DEPENDS:=@PCI_SUPPORT @TARGET_x86_64 +kmod-lib-crc32c +kmod-ptp +kmod-libphy +kmod-mdio-devres
-  KCONFIG:= \
-	CONFIG_AMD_XGBE \
-	CONFIG_AMD_XGBE_DCB=y
+  KCONFIG:=CONFIG_AMD_XGBE
   FILES:=$(LINUX_DIR)/drivers/net/ethernet/amd/xgbe/amd-xgbe.ko
   AUTOLOAD:=$(call AutoLoad,35,amd-xgbe)
 endef
@@ -18,18 +16,6 @@ define KernelPackage/amd-xgbe/description
 endef
 
 $(eval $(call KernelPackage,amd-xgbe))
-
-
-define KernelPackage/dwmac-intel
-  SUBMENU:=$(NETWORK_DEVICES_MENU)
-  TITLE:=Intel GMAC support
-  DEPENDS:=@TARGET_x86_64 +kmod-stmmac-core
-  KCONFIG:=CONFIG_DWMAC_INTEL
-  FILES=$(LINUX_DIR)/drivers/net/ethernet/stmicro/stmmac/dwmac-intel.ko
-  AUTOLOAD=$(call AutoLoad,45,dwmac-intel)
-endef
-
-$(eval $(call KernelPackage,dwmac-intel))
 
 
 define KernelPackage/f71808e-wdt
