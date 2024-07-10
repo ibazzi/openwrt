@@ -42,24 +42,6 @@ endef
 $(eval $(call KernelPackage,atmtcp))
 
 
-define KernelPackage/appletalk
-  SUBMENU:=$(NETWORK_SUPPORT_MENU)
-  TITLE:=Appletalk protocol support
-  KCONFIG:= \
-        CONFIG_ATALK \
-        CONFIG_DEV_APPLETALK \
-        CONFIG_IPDDP=n
-  FILES:=$(LINUX_DIR)/net/appletalk/appletalk.ko
-  AUTOLOAD:=$(call AutoLoad,40,appletalk)
-endef
-
-define KernelPackage/appletalk/description
-  Kernel module for AppleTalk protocol.
-endef
-
-$(eval $(call KernelPackage,appletalk))
-
-
 define KernelPackage/bonding
   SUBMENU:=$(NETWORK_SUPPORT_MENU)
   TITLE:=Ethernet bonding driver
@@ -928,6 +910,7 @@ $(eval $(call KernelPackage,sched-ipset))
 define KernelPackage/sched-mqprio-common
   SUBMENU:=$(NETWORK_SUPPORT_MENU)
   TITLE:=mqprio queue common dependencies support
+  DEPENDS:=@LINUX_6_6
   HIDDEN:=1
   KCONFIG:=CONFIG_NET_SCH_MQPRIO_LIB
   FILES:=$(LINUX_DIR)/net/sched/sch_mqprio_lib.ko
@@ -943,7 +926,7 @@ $(eval $(call KernelPackage,sched-mqprio-common))
 define KernelPackage/sched-mqprio
   SUBMENU:=$(NETWORK_SUPPORT_MENU)
   TITLE:=Multi-queue priority scheduler (MQPRIO)
-  DEPENDS:=+kmod-sched-core +kmod-sched-mqprio-common
+  DEPENDS:=+kmod-sched-core +LINUX_6_6:kmod-sched-mqprio-common
   KCONFIG:=CONFIG_NET_SCH_MQPRIO
   FILES:=$(LINUX_DIR)/net/sched/sch_mqprio.ko
   AUTOLOAD:=$(call AutoProbe, sch_mqprio)
@@ -1026,7 +1009,7 @@ endef
 $(eval $(call KernelPackage,bpf-test))
 
 
-SCHED_MODULES_EXTRA = sch_codel sch_gred sch_multiq sch_sfq sch_teql sch_fq sch_ets act_pedit act_simple act_skbmod act_csum em_cmp em_nbyte em_meta em_text
+SCHED_MODULES_EXTRA = sch_codel sch_gred sch_multiq sch_sfq sch_teql sch_fq act_pedit act_simple act_skbmod act_csum em_cmp em_nbyte em_meta em_text
 SCHED_FILES_EXTRA = $(foreach mod,$(SCHED_MODULES_EXTRA),$(LINUX_DIR)/net/sched/$(mod).ko)
 
 define KernelPackage/sched
@@ -1040,7 +1023,6 @@ define KernelPackage/sched
 	CONFIG_NET_SCH_SFQ \
 	CONFIG_NET_SCH_TEQL \
 	CONFIG_NET_SCH_FQ \
-	CONFIG_NET_SCH_ETS \
 	CONFIG_NET_ACT_PEDIT \
 	CONFIG_NET_ACT_SIMP \
 	CONFIG_NET_ACT_SKBMOD \
@@ -1379,7 +1361,7 @@ define KernelPackage/9pnet
   KCONFIG:= \
 	CONFIG_NET_9P \
 	CONFIG_NET_9P_DEBUG=n \
-	CONFIG_NET_9P_FD=n
+	CONFIG_NET_9P_FD=n@ge5.17
   FILES:= \
 	$(LINUX_DIR)/net/9p/9pnet.ko
   AUTOLOAD:=$(call AutoLoad,29,9pnet)
@@ -1513,23 +1495,6 @@ endef
 $(eval $(call KernelPackage,inet-diag))
 
 
-define KernelPackage/inet-mptcp-diag
-  SUBMENU:=$(NETWORK_SUPPORT_MENU)
-  TITLE:=INET diag support for MultiPath TCP
-  DEPENDS:=@KERNEL_MPTCP +kmod-inet-diag
-  KCONFIG:=CONFIG_INET_MPTCP_DIAG
-  FILES:=$(LINUX_DIR)/net/mptcp/mptcp_diag.ko
-  AUTOLOAD:=$(call AutoProbe,mptcp_diag)
-endef
-
-define KernelPackage/inet-mptcp-diag/description
-Support for INET (MultiPath TCP) socket monitoring interface used by
-native Linux tools such as ss.
-endef
-
-$(eval $(call KernelPackage,inet-mptcp-diag))
-
-
 define KernelPackage/xdp-sockets-diag
   SUBMENU:=$(NETWORK_SUPPORT_MENU)
   TITLE:=PF_XDP sockets monitoring interface support for ss utility
@@ -1649,21 +1614,3 @@ define KernelPackage/qrtr-mhi/description
 endef
 
 $(eval $(call KernelPackage,qrtr-mhi))
-
-define KernelPackage/unix-diag
-  TITLE:=UNIX socket monitoring interface
-  KCONFIG:=CONFIG_UNIX_DIAG
-  FILES:= $(LINUX_DIR)/net/unix/unix_diag.ko
-  AUTOLOAD:=$(call AutoProbe,unix_diag)
-endef
-
-$(eval $(call KernelPackage,unix-diag))
-
-define KernelPackage/packet-diag
-  TITLE:=Packet sockets monitoring interface
-  KCONFIG:=CONFIG_PACKET_DIAG
-  FILES:= $(LINUX_DIR)/net/packet/af_packet_diag.ko
-  AUTOLOAD:=$(call AutoProbe,af_packet_diag)
-endef
-
-$(eval $(call KernelPackage,packet-diag))
