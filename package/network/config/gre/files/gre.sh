@@ -13,6 +13,10 @@ gre_generic_setup() {
 	local local="$3"
 	local remote="$4"
 	local link="$5"
+	local ipaddr="$6"
+
+	local ipaddrnomask="${ipaddr%%/*}"
+	local netmask="${ipaddr##*/}"
 	local mtu ipv6 ttl tos zone ikey okey icsum ocsum iseqno oseqno multicast
 	json_get_vars mtu ipv6 ttl tos zone ikey okey icsum ocsum iseqno oseqno multicast
 
@@ -48,6 +52,8 @@ gre_generic_setup() {
 	[ -n "$zone" ] && json_add_string zone "$zone"
 	proto_close_data
 
+	proto_add_ipv4_address "$ipaddrnomask" "$netmask"
+
 	proto_send_update "$cfg"
 }
 
@@ -56,8 +62,8 @@ gre_setup() {
 	local mode="$2"
 	local remoteip
 
-	local ipaddr peeraddr
-	json_get_vars df ipaddr peeraddr tunlink nohostroute
+	local localaddr peeraddr ipaddr
+	json_get_vars df localaddr peeraddr ipaddr tunlink nohostroute
 
 	[ -z "$peeraddr" ] && {
 		proto_notify_error "$cfg" "MISSING_PEER_ADDRESS"
@@ -81,14 +87,14 @@ gre_setup() {
 		( proto_add_host_dependency "$cfg" "$peeraddr" "$tunlink" )
 	fi
 
-	[ -z "$ipaddr" ] && {
+	[ -z "$localaddr" ] && {
 		local wanif="$tunlink"
 		if [ -z $wanif ] && ! network_find_wan wanif; then
 			proto_notify_error "$cfg" "NO_WAN_LINK"
 			exit
 		fi
 
-		if ! network_get_ipaddr ipaddr "$wanif"; then
+		if ! network_get_ipaddr localaddr "$wanif"; then
 			proto_notify_error "$cfg" "NO_WAN_LINK"
 			exit
 		fi
@@ -98,10 +104,10 @@ gre_setup() {
 
 	case "$mode" in
 		gretapip)
-			gre_generic_setup $cfg $mode $ipaddr $peeraddr "gre4t-$cfg"
+			gre_generic_setup $cfg $mode $localaddr $peeraddr "gre4t-$cfg" $ipaddr
 			;;
 		*)
-			gre_generic_setup $cfg $mode $ipaddr $peeraddr "gre4-$cfg"
+			gre_generic_setup $cfg $mode $localaddr $peeraddr "gre4-$cfg" $ipaddr
 			;;
 	esac
 }
@@ -265,8 +271,9 @@ gre_generic_init_config() {
 
 proto_gre_init_config() {
 	gre_generic_init_config
-	proto_config_add_string "ipaddr"
+	proto_config_add_string "localaddr"
 	proto_config_add_string "peeraddr"
+	proto_config_add_string "ipaddr"
 	proto_config_add_boolean "df"
 	proto_config_add_boolean "nohostroute"
 }
