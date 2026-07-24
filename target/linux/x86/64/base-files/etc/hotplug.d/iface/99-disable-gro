@@ -1,0 +1,7 @@
+#!/bin/sh
+
+if [ "$ACTION" = "ifup" ] && [ "$INTERFACE" = "wan" ]; then
+    logger "WAN is up, turn off gro on $DEVICE"
+    /usr/sbin/ethtool -K $DEVICE gro off
+fi
+
